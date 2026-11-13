@@ -2,6 +2,8 @@
 
 Paste messy text, get it back clean: spacing, broken lines, tracking links, quotes, case.
 
+**[Try it live](https://adrienbalcioglu.github.io/text-cleaner/)**
+
 ## Features
 
 - Collapse spaces and blank lines, join lines broken by a PDF
