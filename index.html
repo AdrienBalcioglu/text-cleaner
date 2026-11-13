@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text Cleaner</title>
+<style>:root{--bg:#f7f7f5;--panel:#fff;--ink:#1c1c1a;--muted:#6b6b66;--line:#e3e3de;--accent:#3d5afe;--accent-ink:#fff;--good:#1a7f4b;--bad:#b3261e;--warn:#9a6700;--soft:#eef0ff;--radius:10px;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--panel:#1d1d1b;--ink:#ececE6;--muted:#9a9a93;--line:#30302c;--accent:#8c9eff;--accent-ink:#11122b;--good:#5fd39a;--bad:#ff8a80;--warn:#e3b341;--soft:#23264a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1080px;margin:0 auto;padding:28px 16px 64px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:24px;margin:0;letter-spacing:-.01em}
+h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+p.lead{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.grid{display:grid;gap:16px}
+@media(min-width:820px){.cols-2{grid-template-columns:1fr 1fr}.cols-3{grid-template-columns:repeat(3,1fr)}.side{grid-template-columns:340px 1fr}}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{min-height:120px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.field{margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.ghost{border-color:transparent;color:var(--muted);padding:4px 8px}
+button:disabled{opacity:.5;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td input{padding:5px 7px}
+.scroll{overflow-x:auto}
+.stat{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat small{display:block;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
+.muted{color:var(--muted)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--accent)}
+.out{white-space:pre-wrap;word-wrap:break-word;font-size:14.5px;min-height:120px}
+.out.mono,code{font-family:var(--mono);font-size:13px}
+.note{font-size:13px;color:var(--muted)}
+footer{margin-top:28px;font-size:13px;color:var(--muted)}
+footer a{color:inherit}
+
+.opts{display:grid;gap:6px 16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.opts label{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:14px;margin:0}
+.opts input{width:auto}
+textarea{min-height:300px;font-size:14.5px}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <h1>Text Cleaner</h1>
+      <p class="lead">Paste text copied from a PDF, an email or a web page and get it back clean. Nothing leaves this page.</p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>Clean-ups</h2>
+    <div class="opts" id="opts"></div>
+    <div class="row" style="margin-top:12px">
+      <label for="case" style="margin:0">Case</label>
+      <select id="case" style="width:auto">
+        <option value="">Leave as is</option><option value="lower">lowercase</option><option value="upper">UPPERCASE</option>
+        <option value="sentence">Sentence case</option><option value="title">Title Case</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="grid cols-2">
+    <section class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Paste here</h2><button id="clear" class="ghost">Clear</button></div>
+      <textarea id="input" placeholder="Paste your text…" aria-label="Text to clean"></textarea>
+      <p id="inStats" class="note"></p>
+    </section>
+    <section class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Clean text</h2><button id="copy" class="primary">Copy</button></div>
+      <textarea id="output" readonly aria-label="Cleaned text"></textarea>
+      <p id="outStats" class="note" role="status"></p>
+    </section>
+  </div>
+  <footer>MIT license · © 2026 Adrien Balcioglu · Runs entirely in your browser: no account, no API key, no server.</footer>
+</main>
+<script>
+const KEY = 'text-cleaner-v1';
+const $ = (id) => document.getElementById(id);
+const TRACKERS = /^(utm_[a-z_]+|fbclid|gclid|gbraid|wbraid|msclkid|mc_cid|mc_eid|igshid|yclid|_hsenc|_hsmi|mkt_tok|ref_src|ref_url|si|spm|vero_id|oly_anon_id|oly_enc_id)$/i;
+
+const OPTIONS = [
+  ['html', 'Strip HTML tags', false, (t) => { const doc = new DOMParser().parseFromString(t, 'text/html'); return /<[a-z][\s\S]*>/i.test(t) ? doc.body.textContent : t; }],
+  ['invisible', 'Remove invisible characters', true, (t) => t.replace(/[​-‍⁠﻿­]/g, '')],
+  ['emoji', 'Remove emoji', false, (t) => t.replace(/[\p{Extended_Pictographic}️‍]/gu, '')],
+  ['quotes', 'Straighten curly quotes and apostrophes', false, (t) => t.replace(/[‘’‚′]/g, "'").replace(/[“”„″]/g, '"')],
+  ['dashes', 'Replace long dashes and ellipsis characters', false, (t) => t.replace(/\s*[–—]\s*/g, ' - ').replace(/…/g, '...')],
+  ['bullets', 'Turn bullet symbols into "- "', false, (t) => t.replace(/^[ \t]*[•◦▪‣●○■□➤►▶*][ \t]+/gm, '- ')],
+  ['unwrap', 'Join lines broken mid-sentence (PDF text)', false, (t) => t.replace(/-\n(?=[a-zà-ÿ])/g, '').replace(/([^\n.!?:;])\n(?!\n|[-*•\d])/g, '$1 ')],
+  ['spaces', 'Collapse repeated spaces', true, (t) => t.replace(/[ \t ]+/g, ' ').replace(/ +\n/g, '\n').replace(/\n +/g, '\n')],
+  ['blank', 'Keep at most one blank line', true, (t) => t.replace(/\n{3,}/g, '\n\n')],
+  ['trackers', 'Remove tracking parameters from links', true, (t) => t.replace(/https?:\/\/[^\s<>"')\]]+/g, (raw) => {
+    try {
+      const url = new URL(raw); let changed = false;
+      for (const key of [...url.searchParams.keys()]) if (TRACKERS.test(key)) { url.searchParams.delete(key); changed = true; }
+      return changed ? url.toString().replace(/\?$/, '') : raw;
+    } catch { return raw; }
+  })],
+  ['dedupe', 'Remove duplicate lines', false, (t) => { const seen = new Set(); return t.split('\n').filter((l) => { const k = l.trim(); if (!k) return true; if (seen.has(k)) return false; seen.add(k); return true; }).join('\n'); }],
+  ['trim', 'Trim the start and the end', true, (t) => t.trim()],
+];
+const CASES = {
+  lower: (t) => t.toLowerCase(),
+  upper: (t) => t.toUpperCase(),
+  sentence: (t) => t.toLowerCase().replace(/(^\s*|[.!?]\s+|\n\s*)(\p{L})/gu, (m, a, b) => a + b.toUpperCase()),
+  title: (t) => t.toLowerCase().replace(/(^|[\s\-(])(\p{L})/gu, (m, a, b) => a + b.toUpperCase()),
+};
+
+let prefs = {};
+try { prefs = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
+const box = $('opts');
+for (const [id, label, on] of OPTIONS) {
+  const wrap = document.createElement('label'); const check = document.createElement('input');
+  check.type = 'checkbox'; check.id = 'o-' + id; check.checked = prefs[id] ?? on;
+  wrap.append(check, document.createTextNode(label)); box.append(wrap);
+}
+$('case').value = prefs.case || '';
+
+const stats = (t) => { const words = (t.trim().match(/\S+/g) || []).length; return `${t.length.toLocaleString('en-US')} characters · ${words.toLocaleString('en-US')} words · ${t ? t.split('\n').length : 0} lines`; };
+function run() {
+  let text = $('input').value.replace(/\r\n?/g, '\n');
+  const next = { case: $('case').value };
+  for (const [id, , , fn] of OPTIONS) { next[id] = $('o-' + id).checked; if (next[id]) text = fn(text); }
+  if (CASES[next.case]) text = CASES[next.case](text);
+  $('output').value = text;
+  $('inStats').textContent = stats($('input').value);
+  const saved = $('input').value.length - text.length;
+  $('outStats').textContent = stats(text) + (saved > 0 ? ` · ${saved.toLocaleString('en-US')} characters removed` : '');
+  try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+}
+document.addEventListener('input', run);
+$('clear').addEventListener('click', () => { $('input').value = ''; run(); $('input').focus(); });
+$('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('output').value); $('copy').textContent = 'Copied'; }
+  catch { $('output').select(); $('copy').textContent = 'Press Ctrl+C'; }
+  setTimeout(() => { $('copy').textContent = 'Copy'; }, 1500);
+});
+run();
+</script>
+</body>
+</html>
