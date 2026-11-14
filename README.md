@@ -2,7 +2,7 @@
 
 Paste messy text, get it back clean: spacing, broken lines, tracking links, quotes, case.
 
-**[Try it live](https://adrienbalcioglu.github.io/text-cleaner/)**
+**[Website](https://adrienbalcioglu.github.io/text-cleaner/about.html)** · **[Open the app](https://adrienbalcioglu.github.io/text-cleaner/)**
 
 ## Features
 
